@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Workout - User App</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.18.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.0.0/dist/pose-detection.min.js"></script>
+    <script src="poseUtils.js"></script>
+    <script src="workoutTracker.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #exerciseList { margin-bottom: 20px; }
+        #videoContainer { display: none; text-align: center; }
+        #output { border: 1px solid #ccc; }
+        #status { color: red; }
+        #currentExercise { font-weight: bold; }
+        button { padding: 10px 20px; margin: 5px; }
+        video { max-width: 640px; }
+    </style>
+</head>
+<body>
+    <h2>Workout</h2>
+    <div id="exerciseList">
+        <h3>Danh Sách Bài Tập</h3>
+        <ul id="exerciseUl"></ul>
+        <button id="startWorkout">Bắt Đầu</button>
+    </div>
+    <div id="videoContainer">
+        <h3 id="currentExercise"></h3>
+        <p>Reps: <span id="currentReps">0</span> / <span id="targetReps"></span></p>
+        <p>Rest Time: <span id="restTimer"></span></p>
+        <video id="video" autoplay style="display: none;"></video>
+        <canvas id="output"></canvas>
+        <p id="status"></p>
+        <button id="openCameraBtn">Mở Camera</button>
+        <button id="resetCountsBtn">Reset Đếm</button>
+    </div>
+    <script>
+        const client = JSON.parse(localStorage.getItem('client'));
+        const exercises = client ? client.exercises : [];
+        let currentExerciseIndex = 0;
+        let currentReps = 0;
+        let targetReps = 0;
+        let restTime = 0;
+        let inRest = false;
+
+        // Load exercise list
+        const ul = document.getElementById('exerciseUl');
+        exercises.forEach(ex => {
+            const li = document.createElement('li');
+            li.innerHTML = `${ex.name} (${ex.target_reps} reps, nghỉ ${ex.rest_time}s)`;
+            if (ex.video_path) {
+                li.innerHTML += `<br><video width="200" controls><source src="${ex.video_path}" type="video/mp4"></video>`;
+            }
+            ul.appendChild(li);
+        });
+
+        document.getElementById('startWorkout').addEventListener('click', () => {
+            document.getElementById('exerciseList').style.display = 'none';
+            document.getElementById('videoContainer').style.display = 'block';
+            startNextExercise();
+        });
+
+        document.getElementById('openCameraBtn').addEventListener('click', openCamera);
+        document.getElementById('resetCountsBtn').addEventListener('click', resetCounts);
+
+        function startNextExercise() {
+            if (currentExerciseIndex >= exercises.length) {
+                document.getElementById('status').innerText = 'Hoàn thành tất cả bài tập!';
+                return;
+            }
+            const ex = exercises[currentExerciseIndex];
+            document.getElementById('currentExercise').innerText = `Bài tập: ${ex.name}`;
+            document.getElementById('targetReps').innerText = ex.target_reps;
+            targetReps = ex.target_reps;
+            restTime = ex.rest_time;
+            currentReps = 0;
+            document.getElementById('currentReps').innerText = currentReps;
+            pushupThresholdInput.value = ex.thresholds.angle_threshold;
+            distanceThresholdInput.value = ex.thresholds.distance_threshold;
+            squatThresholdInput.value = ex.thresholds.angle_threshold;
+            resetCounts();
+            setupDetector();
+        }
+
+        function onRepComplete(exerciseName) {
+            currentReps++;
+            document.getElementById('currentReps').innerText = currentReps;
+            if (currentReps >= targetReps) {
+                startRestTimer();
+            }
+        }
+
+        function startRestTimer() {
+            inRest = true;
+            let timeLeft = restTime;
+            document.getElementById('restTimer').innerText = `${timeLeft}s`;
+            const timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('restTimer').innerText = `${timeLeft}s`;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    inRest = false;
+                    currentExerciseIndex++;
+                    startNextExercise();
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

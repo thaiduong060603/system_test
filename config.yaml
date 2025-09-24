@@ -1,0 +1,26 @@
+exercises:
+  push-up:
+    thresholds:
+      - elbow_angle
+      - distance_from_shoulder_to_knee
+    defaults:
+      elbow_angle: 90
+      distance_from_shoulder_to_knee: 30
+      target_reps: 10
+      rest_time: 60
+  squat:
+    thresholds:
+      - knee_angle
+      - distance_from_shoulder_to_knee
+    defaults:
+      knee_angle: 80
+      distance_from_shoulder_to_knee: 25
+      target_reps: 12
+      rest_time: 45
+  lift_weights:
+    thresholds:
+      - elbow_angle
+    defaults:
+      elbow_angle: 85
+      target_reps: 8
+      rest_time: 90
