@@ -42,5 +42,22 @@
                 "video_path": "videos/pushup_B.mp4"
             }
         ]
+    },
+    {
+        "client_id": "thaiduong",
+        "username": "aaa",
+        "password": "123",
+        "exercises": [
+            {
+                "name": "squat",
+                "thresholds": {
+                    "angle_threshold": 100.0,
+                    "distance_threshold": 70.0
+                },
+                "target_reps": 3,
+                "rest_time": 60,
+                "video_path": "D:/WORK/project_2004/092025/2209/videos/squat_B.mp4"
+            }
+        ]
     }
 ]
