@@ -1,3 +1,4 @@
+
 let pushupCount = 0;
 let squatCount = 0;
 let detector = null;
@@ -6,7 +7,7 @@ let flag_squat = 'up';
 let pushupState = { max_angle: 0, min_angle: 180, farthest_distance: null, closest_distance: null };
 let squatState = { max_angle: 0, min_angle: 180, farthest_distance: null, closest_distance: null };
 
-// Declare variables but do not assign values immediately
+// Khai báo biến nhưng chưa gán giá trị ngay
 let video, canvas, ctx, statusDiv;
 
 // Mock inputs for thresholds (set dynamically)
@@ -14,7 +15,7 @@ const pushupThresholdInput = { value: 100 };
 const squatThresholdInput = { value: 80 };
 const distanceThresholdInput = { value: 30 };
 
-// Initialize DOM elements
+// Hàm khởi tạo DOM elements
 function initializeDOMElements() {
     video = document.getElementById('video');
     canvas = document.getElementById('output');
@@ -30,29 +31,29 @@ function initializeDOMElements() {
 async function setupDetector() {
     if (detector) return;
     
-    // Ensure DOM elements are initialized
+    // Đảm bảo DOM elements đã được khởi tạo
     if (!statusDiv) {
         initializeDOMElements();
     }
     
     try {
-        statusDiv.innerText = 'Initializing model...';
+        statusDiv.innerText = 'Đang khởi tạo mô hình...';
         const detectorConfig = {
             modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING
         };
         detector = await poseDetection.createDetector(poseDetection.SupportedModels.MoveNet, detectorConfig);
-        statusDiv.innerText = 'Model is ready.';
+        statusDiv.innerText = 'Mô hình đã sẵn sàng.';
         
         if (video && video.srcObject) {
             renderPrediction();
         }
     } catch (error) {
-        statusDiv.innerText = `Model initialization error: ${error.message}`;
+        statusDiv.innerText = `Lỗi khởi tạo mô hình: ${error.message}`;
     }
 }
 
 async function openCamera() {
-    // Ensure DOM elements are initialized
+    // Đảm bảo DOM elements đã được khởi tạo
     if (!video || !statusDiv) {
         initializeDOMElements();
     }
@@ -62,7 +63,7 @@ async function openCamera() {
         video.srcObject = stream;
         video.play();
         
-        // Wait until video is loaded
+        // Đợi video load xong
         video.addEventListener('loadeddata', () => {
             if (canvas) {
                 canvas.width = video.videoWidth;
@@ -74,7 +75,7 @@ async function openCamera() {
         });
         
     } catch (err) {
-        statusDiv.innerText = 'Camera access error: ' + err.message;
+        statusDiv.innerText = 'Lỗi truy cập camera: ' + err.message;
     }
 }
 
@@ -202,7 +203,7 @@ function processSquat(kneeAngle, shoulderToKneeDistance, angleThres, distThres) 
     }
 }
 
-// Export necessary variables to global scope
+// Export các biến cần thiết ra global scope
 window.pushupThresholdInput = pushupThresholdInput;
 window.squatThresholdInput = squatThresholdInput;
 window.distanceThresholdInput = distanceThresholdInput;
@@ -210,7 +211,7 @@ window.setupDetector = setupDetector;
 window.openCamera = openCamera;
 window.resetCounts = resetCounts;
 
-// Initialize DOM elements when script loads
+// Khởi tạo DOM elements khi script load
 document.addEventListener('DOMContentLoaded', function() {
     initializeDOMElements();
 });

@@ -38,6 +38,7 @@
     </script>
 </body>
 </html> -->
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -51,21 +52,21 @@
 </head>
 <body>
     <div class="login-box">
-        <h2>Đăng Nhập</h2>
+        <h2>Login</h2>
 
         <!-- Upload JSON database -->
         <input type="file" id="fileInput" accept=".json"><br>
 
         <input type="text" id="username" placeholder="Username" required><br>
         <input type="password" id="password" placeholder="Password" required><br>
-        <button onclick="login()">Đăng Nhập</button>
+        <button onclick="login()">Login</button>
         <p id="error" style="color: red;"></p>
     </div>
 
     <script>
-        let db = []; // dữ liệu JSON sẽ được load vào đây
+        let db = []; // JSON data will be loaded here
 
-        // Khi người dùng chọn file JSON
+        // When user selects JSON file
         document.getElementById('fileInput').addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -73,18 +74,18 @@
             reader.onload = function(e) {
                 try {
                     db = JSON.parse(e.target.result);
-                    document.getElementById('error').innerText = "Tải dữ liệu thành công!";
+                    document.getElementById('error').innerText = "Data loaded successfully!";
                 } catch (err) {
-                    document.getElementById('error').innerText = "Lỗi đọc file JSON: " + err.message;
+                    document.getElementById('error').innerText = "Error reading JSON file: " + err.message;
                 }
             };
             reader.readAsText(file);
         });
 
-        // Hàm login
+        // Login function
         function login() {
             if (!db.length) {
-                document.getElementById('error').innerText = "Bạn cần chọn file gym_database.json trước!";
+                document.getElementById('error').innerText = "You need to select gym_database.json first!";
                 return;
             }
 
@@ -97,9 +98,10 @@
                 localStorage.setItem('client', JSON.stringify(client));
                 window.location.href = 'workout.html';
             } else {
-                document.getElementById('error').innerText = 'Sai username hoặc password!';
+                document.getElementById('error').innerText = 'Incorrect username or password!';
             }
         }
     </script>
 </body>
 </html>
+

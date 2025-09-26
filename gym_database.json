@@ -10,8 +10,8 @@
                     "angle_threshold": 100,
                     "distance_threshold": 30
                 },
-                "target_reps": 15,
-                "rest_time": 60,
+                "target_reps": 1,
+                "rest_time": 10,
                 "video_path": "videos/pushup_B.mp4"
             },
             {
@@ -20,8 +20,8 @@
                     "angle_threshold": 80,
                     "distance_threshold": 40
                 },
-                "target_reps": 20,
-                "rest_time": 90,
+                "target_reps": 2,
+                "rest_time": 10,
                 "video_path": "videos/squat_B.mp4"
             }
         ]

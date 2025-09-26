@@ -1,114 +1,4 @@
-<!-- <!DOCTYPE html>
-<html>
-<head>
-    <title>Workout - User App</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.18.0/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.0.0/dist/pose-detection.min.js"></script>
-    <script src="poseUtils.js"></script>
-    <script src="workoutTracker.js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        #exerciseList { margin-bottom: 20px; }
-        #videoContainer { display: none; text-align: center; }
-        #output { border: 1px solid #ccc; }
-        #status { color: red; }
-        #currentExercise { font-weight: bold; }
-        button { padding: 10px 20px; margin: 5px; }
-        video { max-width: 640px; }
-    </style>
-</head>
-<body>
-    <h2>Workout</h2>
-    <div id="exerciseList">
-        <h3>Danh Sách Bài Tập</h3>
-        <ul id="exerciseUl"></ul>
-        <button id="startWorkout">Bắt Đầu</button>
-    </div>
-    <div id="videoContainer">
-        <h3 id="currentExercise"></h3>
-        <p>Reps: <span id="currentReps">0</span> / <span id="targetReps"></span></p>
-        <p>Rest Time: <span id="restTimer"></span></p>
-        <video id="video" autoplay style="display: none;"></video>
-        <canvas id="output"></canvas>
-        <p id="status"></p>
-        <button id="openCameraBtn">Mở Camera</button>
-        <button id="resetCountsBtn">Reset Đếm</button>
-    </div>
-    <script>
-        const client = JSON.parse(localStorage.getItem('client'));
-        const exercises = client ? client.exercises : [];
-        let currentExerciseIndex = 0;
-        let currentReps = 0;
-        let targetReps = 0;
-        let restTime = 0;
-        let inRest = false;
-
-        // Load exercise list
-        const ul = document.getElementById('exerciseUl');
-        exercises.forEach(ex => {
-            const li = document.createElement('li');
-            li.innerHTML = `${ex.name} (${ex.target_reps} reps, nghỉ ${ex.rest_time}s)`;
-            if (ex.video_path) {
-                li.innerHTML += `<br><video width="200" controls><source src="${ex.video_path}" type="video/mp4"></video>`;
-            }
-            ul.appendChild(li);
-        });
-
-        document.getElementById('startWorkout').addEventListener('click', () => {
-            document.getElementById('exerciseList').style.display = 'none';
-            document.getElementById('videoContainer').style.display = 'block';
-            startNextExercise();
-        });
-
-        document.getElementById('openCameraBtn').addEventListener('click', openCamera);
-        document.getElementById('resetCountsBtn').addEventListener('click', resetCounts);
-
-        function startNextExercise() {
-            if (currentExerciseIndex >= exercises.length) {
-                document.getElementById('status').innerText = 'Hoàn thành tất cả bài tập!';
-                return;
-            }
-            const ex = exercises[currentExerciseIndex];
-            document.getElementById('currentExercise').innerText = `Bài tập: ${ex.name}`;
-            document.getElementById('targetReps').innerText = ex.target_reps;
-            targetReps = ex.target_reps;
-            restTime = ex.rest_time;
-            currentReps = 0;
-            document.getElementById('currentReps').innerText = currentReps;
-            pushupThresholdInput.value = ex.thresholds.angle_threshold;
-            distanceThresholdInput.value = ex.thresholds.distance_threshold;
-            squatThresholdInput.value = ex.thresholds.angle_threshold;
-            resetCounts();
-            setupDetector();
-        }
-
-        function onRepComplete(exerciseName) {
-            currentReps++;
-            document.getElementById('currentReps').innerText = currentReps;
-            if (currentReps >= targetReps) {
-                startRestTimer();
-            }
-        }
-
-        function startRestTimer() {
-            inRest = true;
-            let timeLeft = restTime;
-            document.getElementById('restTimer').innerText = `${timeLeft}s`;
-            const timer = setInterval(() => {
-                timeLeft--;
-                document.getElementById('restTimer').innerText = `${timeLeft}s`;
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    inRest = false;
-                    currentExerciseIndex++;
-                    startNextExercise();
-                }
-            }, 1000);
-        }
-    </script>
-</body>
-</html> -->
-
+<!-- 
 <!DOCTYPE html>
 <html>
 <head>
@@ -229,6 +119,317 @@
                     window.inRest = false; // Cập nhật global variable
                     currentExerciseIndex++;
                     window.currentExerciseIndex = currentExerciseIndex; // Cập nhật global variable
+                    startNextExercise();
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html> -->
+
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <title>Workout - User App</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.18.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.0.0/dist/pose-detection.min.js"></script>
+    <script src="poseUtils.js"></script>
+    <script src="workoutTracker.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #exerciseList { margin-bottom: 20px; }
+        #videoContainer { display: none; text-align: center; }
+        #output { border: 1px solid #ccc; }
+        #status { color: red; }
+        #currentExercise { font-weight: bold; }
+        button { padding: 10px 20px; margin: 5px; }
+        video { max-width: 640px; }
+    </style>
+</head>
+<body>
+    <h2>Workout</h2>
+    <div id="exerciseList">
+        <h3>Exercise List</h3>
+        <ul id="exerciseUl"></ul>
+        <button id="startWorkout">Start Workout</button>
+    </div>
+    <div id="videoContainer">
+        <h3 id="currentExercise"></h3>
+        <p>Reps: <span id="currentReps">0</span> / <span id="targetReps"></span></p>
+        <p>Rest Time: <span id="restTimer"></span></p>
+        <video id="video" autoplay style="display: none;"></video>
+        <canvas id="output"></canvas>
+        <p id="status"></p>
+        <button id="openCameraBtn">Open Camera</button>
+        <button id="resetCountsBtn">Reset Counts</button>
+    </div>
+
+    <script>
+        const client = JSON.parse(localStorage.getItem('client'));
+        const exercises = client ? client.exercises : [];
+        let currentExerciseIndex = 0;
+        let currentReps = 0;
+        let targetReps = 0;
+        let restTime = 0;
+        let inRest = false;
+
+        // Export variables to global scope for workoutTracker.js to access
+        window.exercises = exercises;
+        window.currentExerciseIndex = currentExerciseIndex;
+        window.inRest = inRest;
+
+        // Load exercise list
+        const ul = document.getElementById('exerciseUl');
+        exercises.forEach(ex => {
+            const li = document.createElement('li');
+            li.innerHTML = `${ex.name} (${ex.target_reps} reps, rest ${ex.rest_time}s)`;
+            if (ex.video_path) {
+                li.innerHTML += `<br><video width="200" controls><source src="${ex.video_path}" type="video/mp4"></video>`;
+            }
+            ul.appendChild(li);
+        });
+
+        document.getElementById('startWorkout').addEventListener('click', () => {
+            document.getElementById('exerciseList').style.display = 'none';
+            document.getElementById('videoContainer').style.display = 'block';
+            startNextExercise();
+        });
+
+        document.getElementById('openCameraBtn').addEventListener('click', openCamera);
+        document.getElementById('resetCountsBtn').addEventListener('click', resetCounts);
+
+        function startNextExercise() {
+            if (currentExerciseIndex >= exercises.length) {
+                document.getElementById('status').innerText = 'All exercises completed!';
+                return;
+            }
+            
+            const ex = exercises[currentExerciseIndex];
+            document.getElementById('currentExercise').innerText = `Exercise: ${ex.name}`;
+            document.getElementById('targetReps').innerText = ex.target_reps;
+            targetReps = ex.target_reps;
+            restTime = ex.rest_time;
+            currentReps = 0;
+            document.getElementById('currentReps').innerText = currentReps;
+            
+            // Use variables from global scope
+            window.pushupThresholdInput.value = ex.thresholds.angle_threshold;
+            window.distanceThresholdInput.value = ex.thresholds.distance_threshold;
+            window.squatThresholdInput.value = ex.thresholds.angle_threshold;
+            
+            resetCounts();
+            setupDetector();
+        }
+
+        function onRepComplete(exerciseName) {
+            currentReps++;
+            document.getElementById('currentReps').innerText = currentReps;
+            if (currentReps >= targetReps) {
+                startRestTimer();
+            }
+        }
+
+        // Export function to global scope
+        window.onRepComplete = onRepComplete;
+
+        function startRestTimer() {
+            inRest = true;
+            window.inRest = true; // Update global variable
+            let timeLeft = restTime;
+            document.getElementById('restTimer').innerText = `${timeLeft}s`;
+            
+            const timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('restTimer').innerText = `${timeLeft}s`;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    inRest = false;
+                    window.inRest = false; // Update global variable
+                    currentExerciseIndex++;
+                    window.currentExerciseIndex = currentExerciseIndex; // Update global variable
+                    startNextExercise();
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Workout - User App</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.18.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.0.0/dist/pose-detection.min.js"></script>
+    <script src="poseUtils.js"></script>
+    <script src="workoutTracker.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #exerciseList { margin-bottom: 20px; }
+        #videoContainer { display: none; text-align: center; }
+        #output { border: 1px solid #ccc; }
+        #status { color: red; }
+        #currentExercise { font-weight: bold; }
+        button { padding: 10px 20px; margin: 5px; }
+        video { max-width: 640px; }
+        #restartDialog { 
+            display: none; 
+            position: fixed; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            background: white; 
+            padding: 20px; 
+            border: 2px solid #ccc; 
+            border-radius: 10px; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.3); 
+            z-index: 1000; 
+            text-align: center; 
+        }
+    </style>
+</head>
+<body>
+    <h2>Workout</h2>
+    <div id="exerciseList">
+        <h3>Exercise List</h3>
+        <ul id="exerciseUl"></ul>
+        <button id="startWorkout">Start Workout</button>
+    </div>
+    <div id="videoContainer">
+        <h3 id="currentExercise"></h3>
+        <p>Reps: <span id="currentReps">0</span> / <span id="targetReps"></span></p>
+        <p>Rest Time: <span id="restTimer"></span></p>
+        <video id="video" autoplay style="display: none;"></video>
+        <canvas id="output"></canvas>
+        <p id="status"></p>
+        <button id="openCameraBtn">Open Camera</button>
+        <button id="resetCountsBtn">Reset Counts</button>
+    </div>
+
+    <!-- Dialog for restart confirmation -->
+    <div id="restartDialog">
+        <h3>Congratulations!</h3>
+        <p>You have completed all exercises! Do you want to start over?</p>
+        <button id="restartYes">Yes</button>
+        <button id="restartNo">No</button>
+    </div>
+
+    <script>
+        const client = JSON.parse(localStorage.getItem('client'));
+        const exercises = client ? client.exercises : [];
+        let currentExerciseIndex = 0;
+        let currentReps = 0;
+        let targetReps = 0;
+        let restTime = 0;
+        let inRest = false;
+
+        // Export variables to global scope for workoutTracker.js to access
+        window.exercises = exercises;
+        window.currentExerciseIndex = currentExerciseIndex;
+        window.inRest = inRest;
+
+        // Load exercise list
+        const ul = document.getElementById('exerciseUl');
+        exercises.forEach(ex => {
+            const li = document.createElement('li');
+            li.innerHTML = `${ex.name} (${ex.target_reps} reps, rest ${ex.rest_time}s)`;
+            if (ex.video_path) {
+                li.innerHTML += `<br><video width="200" controls><source src="${ex.video_path}" type="video/mp4"></video>`;
+            }
+            ul.appendChild(li);
+        });
+
+        document.getElementById('startWorkout').addEventListener('click', () => {
+            document.getElementById('exerciseList').style.display = 'none';
+            document.getElementById('videoContainer').style.display = 'block';
+            startNextExercise();
+        });
+
+        document.getElementById('openCameraBtn').addEventListener('click', openCamera);
+        document.getElementById('resetCountsBtn').addEventListener('click', resetCounts);
+
+        // Restart dialog handlers
+        document.getElementById('restartYes').addEventListener('click', () => {
+            document.getElementById('restartDialog').style.display = 'none';
+            resetWorkout();
+            startNextExercise();
+        });
+
+        document.getElementById('restartNo').addEventListener('click', () => {
+            document.getElementById('restartDialog').style.display = 'none';
+            // Optionally, you can hide the video container and show exercise list
+            document.getElementById('videoContainer').style.display = 'none';
+            document.getElementById('exerciseList').style.display = 'block';
+        });
+
+        function startNextExercise() {
+            if (currentExerciseIndex >= exercises.length) {
+                showCompletionDialog();
+                return;
+            }
+            
+            const ex = exercises[currentExerciseIndex];
+            document.getElementById('currentExercise').innerText = `Exercise: ${ex.name}`;
+            document.getElementById('targetReps').innerText = ex.target_reps;
+            targetReps = ex.target_reps;
+            restTime = ex.rest_time;
+            currentReps = 0;
+            document.getElementById('currentReps').innerText = currentReps;
+            
+            // Use variables from global scope
+            window.pushupThresholdInput.value = ex.thresholds.angle_threshold;
+            window.distanceThresholdInput.value = ex.thresholds.distance_threshold;
+            window.squatThresholdInput.value = ex.thresholds.angle_threshold;
+            
+            resetCounts();
+            setupDetector();
+        }
+
+        function showCompletionDialog() {
+            document.getElementById('restartDialog').style.display = 'block';
+            document.getElementById('status').innerText = 'All exercises completed!';
+        }
+
+        function resetWorkout() {
+            currentExerciseIndex = 0;
+            currentReps = 0;
+            targetReps = 0;
+            restTime = 0;
+            inRest = false;
+            
+            // Update global variables
+            window.currentExerciseIndex = currentExerciseIndex;
+            window.inRest = inRest;
+            
+            resetCounts();
+        }
+
+        function onRepComplete(exerciseName) {
+            currentReps++;
+            document.getElementById('currentReps').innerText = currentReps;
+            if (currentReps >= targetReps) {
+                startRestTimer();
+            }
+        }
+
+        // Export function to global scope
+        window.onRepComplete = onRepComplete;
+
+        function startRestTimer() {
+            inRest = true;
+            window.inRest = true; // Update global variable
+            let timeLeft = restTime;
+            document.getElementById('restTimer').innerText = `${timeLeft}s`;
+            
+            const timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('restTimer').innerText = `${timeLeft}s`;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    inRest = false;
+                    window.inRest = false; // Update global variable
+                    currentExerciseIndex++;
+                    window.currentExerciseIndex = currentExerciseIndex; // Update global variable
                     startNextExercise();
                 }
             }, 1000);
